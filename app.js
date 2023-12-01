@@ -1,12 +1,28 @@
-const http = require("http");
+const express = require("express");
+const bodyParser = require("body-parser");
+const adminData = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
+const path = require("path");
 
-const routes = require("./routes");
+const app = express();
 
-console.log(routes.someText);
+app.use(bodyParser.urlencoded({ extended: false })); // this has next() built-in, parses the req.body automatically
+app.use("/admin", adminData.routes); // for every route staring with /admin, use the mentioned routes
+app.use(shopRoutes);
+
+/* 
+Handling 404 page should always be at the bottom because the Node.js scans the routes from top to bottom in this file.
+* In this way, if the entered route in the browser didn't match any of the above, only then it will return this 404.
+* If it was placed first, it would always be executed,
+* because we are using app.use() and the default route is not set, which means scan all routes with all types of requests.
+*/
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "views", "not-found.html"));
+});
 
 // This is an ongoing event listener which keeps the event loop running:
-const server = http.createServer(routes.handler); // parameter is a function which executes for every request reaching the server
-server.listen(3000);
+// const server = http.createServer(app); // parameter is a function which executes for every request reaching the server
+app.listen(3000);
 
 /* 
 EVENT LOOP:

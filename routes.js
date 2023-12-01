@@ -1,3 +1,4 @@
+// NOTE: This file is for learning purposes only.
 const fs = require("fs");
 
 // this function gets called on every request reaching the server
